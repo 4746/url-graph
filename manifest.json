@@ -1,0 +1,9 @@
+{
+	"id": "url-graph",
+	"name": "URL Graph",
+	"version": "1.0.0",
+	"minAppVersion": "1.8.7",
+	"description": "Visualize links between notes using external URLs.",
+	"author": "Vadim Shvets",
+	"isDesktopOnly": false
+}
