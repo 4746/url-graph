@@ -7,6 +7,7 @@ import { registerControls } from './ui/plugin-controls';
 import { GraphPreferences } from './graph/preferences';
 import { ConnectionsController } from './ui/connections-controller';
 import { registerGraphViews } from './ui/register-graph-views';
+import { registerIcons } from './ui/icons';
 
 export default class UrlGraphPlugin extends Plugin {
 	settings: UrlGraphSettings = { ...DEFAULT_SETTINGS };
@@ -16,6 +17,7 @@ export default class UrlGraphPlugin extends Plugin {
 	graphPreferences = new GraphPreferences(() => this.settings);
 
 	async onload(): Promise<void> {
+		registerIcons(this);
 		this.settings = loadSettings(await this.loadData());
 		this.i18n = new I18n(this.settings.language, getLanguage);
 		this.indexer = this.addChild(new UrlIndexer(this.app, () => this.settings.urlProperty, () => this.settings.metadataProperties));

@@ -15,6 +15,7 @@ import type { ConnectionsController } from './connections-controller';
 import { focusGraph, pinConnections } from './graph-focus';
 import { registerNodeMenu } from './graph-node-menu';
 import type { GraphSnapshot } from '../graph/types';
+import { URL_GRAPH_ICON } from './icons';
 
 export const URL_GRAPH_VIEW = 'url-graph-view';
 
@@ -40,7 +41,7 @@ export class UrlGraphView extends ItemView {
 		private connections: ConnectionsController, private openSettings: () => void) { super(leaf); }
 	getViewType(): string { return URL_GRAPH_VIEW; }
 	getDisplayText(): string { return this.i18n.t('graph.title'); }
-	getIcon(): string { return 'git-fork'; }
+	getIcon(): string { return URL_GRAPH_ICON; }
 	onPaneMenu(menu: Menu, source: string): void {
 		super.onPaneMenu(menu, source);
 		const busy = loadingText(this.i18n, this.indexer.progress, this.renderPhase) !== null;

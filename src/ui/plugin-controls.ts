@@ -1,9 +1,10 @@
 import { setTooltip, type Command, type Plugin } from 'obsidian';
 import type { I18n } from '../i18n';
+import { URL_GRAPH_ICON } from './icons';
 
 export function registerControls(plugin: Plugin, i18n: I18n, openGraph: () => Promise<void>, rebuild: () => void,
 	openConnections?: () => Promise<void>): void {
-	const ribbon = plugin.addRibbonIcon('git-fork', i18n.t('graph.open'), () => { void openGraph(); });
+	const ribbon = plugin.addRibbonIcon(URL_GRAPH_ICON, i18n.t('graph.open'), () => { void openGraph(); });
 	let commands: Command[] = [];
 	const update = () => {
 		setTooltip(ribbon, i18n.t('graph.open'), { placement: 'right' });
