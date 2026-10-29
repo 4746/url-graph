@@ -4,6 +4,7 @@
 	"description": "Visualize directed links between Obsidian notes by their frontmatter URLs.",
 	"main": "main.js",
 	"type": "module",
+	"homepage": "https://github.com/4746/url-graph",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
