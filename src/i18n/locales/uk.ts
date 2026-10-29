@@ -29,6 +29,7 @@ export const uk = {
 	'command.connections': 'Відкрити URL-зв’язки',
 	'connections.close': 'Закрити URL-зв’язки',
 	'connections.title': 'URL-зв’язки',
+	'connections.openFailed': 'Не вдалося відкрити URL-зв’язки. Спробуйте ще раз або перевірте консоль Obsidian.',
 	'connections.show': 'Показати зв’язки',
 	'connections.clearHighlight': 'Прибрати підсвічування графа',
 	'connections.chooseNote': 'Відкрийте Markdown-нотатку або виберіть «Показати зв’язки» для вузла графа.',

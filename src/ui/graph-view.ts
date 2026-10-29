@@ -48,9 +48,10 @@ export class UrlGraphView extends ItemView {
 			['graph.fit', 'maximize', () => this.cy?.fit(undefined, 45), busy],
 			['graph.arrange', 'network', () => this.renderGraph(true, true), busy],
 			['graph.rebuild', 'refresh-cw', () => this.indexer.rebuild(), busy],
-			['connections.show', 'list-tree', () => { void this.connections.show(this.getRootPath() ?? undefined); }, false],
-			['graph.settings', 'settings-2', this.openSettings, false],
 		];
+		const root = this.getRootPath();
+		if (root) actions.push(['connections.show', 'list-tree', () => { void this.connections.show(root); }, false]);
+		actions.push(['graph.settings', 'settings-2', this.openSettings, false]);
 		menu.addSeparator();
 		for (const [key, icon, callback, disabled] of actions) {
 			menu.addItem((item) => item.setTitle(this.i18n.t(key)).setIcon(icon).setDisabled(disabled).onClick(callback));

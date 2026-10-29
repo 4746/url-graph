@@ -27,6 +27,7 @@ export const en = {
 	'command.connections': 'Open URL connections',
 	'connections.close': 'Close URL connections',
 	'connections.title': 'URL connections',
+	'connections.openFailed': 'Could not open URL connections. Try again or check the Obsidian console for details.',
 	'connections.show': 'Show connections',
 	'connections.clearHighlight': 'Clear graph highlight',
 	'connections.chooseNote': 'Open a Markdown note or select Show connections on a graph node.',

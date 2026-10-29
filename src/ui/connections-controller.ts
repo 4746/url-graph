@@ -60,13 +60,21 @@ export class ConnectionsController extends Component {
 	async show(path?: string): Promise<void> {
 		const { workspace } = this.plugin.app;
 		const file = workspace.getActiveFile();
-		this.pinned = true;
-		this.selection.select(path ?? (file?.extension === 'md' ? file.path : this.selection.path), true);
-		let leaf = workspace.getLeavesOfType(CONNECTIONS_VIEW)[0];
-		if (!leaf) {
-			leaf = await workspace.ensureSideLeaf(CONNECTIONS_VIEW, 'right', { active: true, reveal: false });
+		const target = path ?? (file?.extension === 'md' ? file.path : this.selection.path);
+		try {
+			let leaf = workspace.getLeavesOfType(CONNECTIONS_VIEW)[0];
+			if (!leaf) {
+				leaf = await workspace.ensureSideLeaf(CONNECTIONS_VIEW, 'right', { active: true, reveal: true });
+			}
+			await workspace.revealLeaf(leaf);
+			// Opening/revealing a leaf can fire focus and view-close events that clear the old selection.
+			this.pinned = target !== null;
+			this.selection.select(target, true);
+			if (!target) new Notice(this.plugin.i18n.t('connections.chooseNote'));
+		} catch (error) {
+			console.error('URL Graph: failed to open connections view', error);
+			new Notice(this.plugin.i18n.t('connections.openFailed'));
 		}
-		await workspace.revealLeaf(leaf);
 	}
 
 	async openNote(path: string): Promise<void> {

@@ -6,6 +6,26 @@ import { TFile } from './obsidian';
 import { I18n } from '../src/i18n';
 import { DEFAULT_SETTINGS } from '../src/settings-data';
 
+void test('show connections keeps its target when opening the sidebar temporarily clears selection', async () => {
+	const leaf = {};
+	let controller: ConnectionsController;
+	let revealed = 0;
+	const plugin = {
+		i18n: new I18n('en', () => 'en'),
+		app: { workspace: {
+			getActiveFile: () => null,
+			getLeavesOfType: () => [],
+			ensureSideLeaf: () => { controller.clearSelection(); return Promise.resolve(leaf); },
+			revealLeaf: (target: unknown) => { assert.equal(target, leaf); revealed++; return Promise.resolve(); },
+		} },
+	} as unknown as UrlGraphPlugin;
+	controller = new ConnectionsController(plugin);
+	await controller.show('a.md');
+	assert.equal(revealed, 1);
+	assert.equal(controller.selection.path, 'a.md');
+	assert.equal(controller.highlightPath, 'a.md');
+});
+
 void test('connections controller follows Markdown files, keeps graph selection, handles renames and cleans up listeners', async () => {
 	let active: TFile | null = new TFile('folder/a.md');
 	let fileOpen: ((file: TFile | null) => void) | undefined;
