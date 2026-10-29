@@ -1,5 +1,5 @@
 import { registerNodeTooltip } from './node-tooltip';
-import { ItemView, Notice, setIcon, setTooltip, TFile, type IconName, type WorkspaceLeaf } from 'obsidian';
+import { ItemView, Notice, TFile, type Menu, type IconName, type WorkspaceLeaf } from 'obsidian';
 import cytoscape, { type Core, type EventObjectNode } from 'cytoscape';
 import type { UrlIndexer } from '../indexing/indexer';
 import { graphStyle } from './graph-style';
@@ -27,7 +27,6 @@ export class UrlGraphView extends ItemView {
 	private loaderText!: HTMLElement;
 	private unsubscribe: (() => void) | undefined;
 	private observer: ResizeObserver | undefined;
-	private labels = new Map<HTMLButtonElement, TranslationKey>();
 	private visibleGraph: DisplayGraph | undefined;
 	private settingsTimer: number | undefined;
 	private renderer: GraphRenderer | undefined;
@@ -42,6 +41,22 @@ export class UrlGraphView extends ItemView {
 	getViewType(): string { return URL_GRAPH_VIEW; }
 	getDisplayText(): string { return this.i18n.t('graph.title'); }
 	getIcon(): string { return 'git-fork'; }
+	onPaneMenu(menu: Menu, source: string): void {
+		super.onPaneMenu(menu, source);
+		const busy = loadingText(this.i18n, this.indexer.progress, this.renderPhase) !== null;
+		const actions: Array<[TranslationKey, IconName, () => void, boolean]> = [
+			['graph.fit', 'maximize', () => this.cy?.fit(undefined, 45), busy],
+			['graph.arrange', 'network', () => this.renderGraph(true, true), busy],
+			['graph.rebuild', 'refresh-cw', () => this.indexer.rebuild(), busy],
+			['connections.show', 'list-tree', () => { void this.connections.show(this.getRootPath() ?? undefined); }, false],
+			['graph.settings', 'settings-2', this.openSettings, false],
+		];
+		menu.addSeparator();
+		for (const [key, icon, callback, disabled] of actions) {
+			menu.addItem((item) => item.setTitle(this.i18n.t(key)).setIcon(icon).setDisabled(disabled).onClick(callback));
+		}
+		menu.addSeparator();
+	}
 	protected getRootPath(): string | null { return null; }
 	protected graphSnapshot(): GraphSnapshot { return this.indexer.snapshot; }
 	protected renderGraph(forceLayout = false, fit = false): void {
@@ -52,12 +67,6 @@ export class UrlGraphView extends ItemView {
 		this.contentEl.empty();
 		this.contentEl.addClass('url-graph-view');
 		const toolbar = this.contentEl.createDiv({ cls: 'url-graph-toolbar' });
-		const actions = toolbar.createDiv({ cls: 'url-graph-toolbar-actions', attr: { role: 'group', 'aria-label': this.i18n.t('graph.title') } });
-		this.button(actions, 'graph.fit', () => this.cy?.fit(undefined, 45), 'maximize');
-		this.button(actions, 'graph.arrange', () => this.renderGraph(true, true), 'network');
-		this.button(actions, 'graph.rebuild', () => this.indexer.rebuild(), 'refresh-cw');
-		this.button(actions, 'connections.show', () => { void this.connections.show(this.getRootPath() ?? undefined); }, 'list-tree');
-		this.button(actions, 'graph.settings', this.openSettings, 'settings-2');
 		this.metadataFilters = new MetadataFilters(toolbar, this.i18n, this.setMetadataFilter);
 		this.updateMetadataFilters();
 		this.status = toolbar.createSpan({ cls: 'url-graph-status', attr: { role: 'status', 'aria-live': 'polite' } });
@@ -150,15 +159,6 @@ export class UrlGraphView extends ItemView {
 		this.metadataFilters?.update(this.indexer.snapshot, options.metadataProperties, options.metadataFilters);
 	}
 
-	private button(parent: HTMLElement, key: TranslationKey, callback: () => void, icon: IconName): void {
-		const button = parent.createEl('button', { cls: 'url-graph-toolbar-button clickable-icon', attr: { type: 'button' } });
-		setIcon(button, icon);
-		setTooltip(button, this.i18n.t(key), { placement: 'bottom' });
-		button.setAttribute('aria-label', this.i18n.t(key));
-		this.labels.set(button, key);
-		this.registerDomEvent(button, 'click', callback);
-	}
-
 	private async openNote(path: string): Promise<void> {
 		const file = this.app.vault.getAbstractFileByPath(path);
 		if (!(file instanceof TFile)) { this.indexer.rebuild(); return; }
@@ -172,11 +172,6 @@ export class UrlGraphView extends ItemView {
 		this.scopeCaption?.setText(root ? this.i18n.t('graph.localFor', { path: root }) : '');
 		this.scopeCaption?.toggleClass('is-hidden', !root);
 		const loading = loadingText(this.i18n, this.indexer.progress, this.renderPhase);
-		for (const [button, key] of this.labels) {
-			setTooltip(button, this.i18n.t(key), { placement: 'bottom' });
-			button.setAttribute('aria-label', this.i18n.t(key));
-			button.disabled = loading !== null && key !== 'connections.show' && key !== 'graph.settings';
-		}
 		this.loader.toggleClass('is-hidden', loading === null);
 		this.loaderText.setText(loading ?? '');
 		this.canvas.setAttribute('aria-busy', String(loading !== null));
@@ -203,7 +198,6 @@ export class UrlGraphView extends ItemView {
 		this.settingsTimer = undefined;
 		this.visibleGraph = undefined;
 		this.metadataFilters = undefined;
-		this.labels.clear();
 		this.unsubscribe?.();
 		this.unsubscribe = undefined;
 		this.observer?.disconnect();

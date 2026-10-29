@@ -15,12 +15,6 @@
 .url-graph-status { color: var(--text-muted); font-size: var(--font-ui-small); }
 .url-graph-scope-caption { padding: 6px 12px; font-size: var(--font-ui-small); color: var(--text-muted); border-bottom: 1px solid var(--background-modifier-border); overflow-wrap: anywhere; }
 .url-graph-scope-caption.is-hidden { display: none; }
-.url-graph-toolbar-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.url-graph-toolbar button.url-graph-toolbar-button { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 6px; border: 0; box-shadow: none; background: transparent; color: var(--text-muted); }
-.url-graph-toolbar-button svg { width: 18px; height: 18px; }
-.url-graph-toolbar button.url-graph-toolbar-button:hover:enabled { color: var(--text-normal); background: var(--background-modifier-hover); }
-.url-graph-toolbar-button:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 1px; }
-.url-graph-toolbar-button:disabled { opacity: 0.4; }
 .url-graph-metadata-filters { display: flex; flex-wrap: wrap; gap: var(--size-4-3); }
 .url-graph-metadata-filter { display: flex; align-items: center; gap: var(--size-4-2); font-size: var(--font-ui-small); }
 .url-graph-metadata-filter select { max-width: 200px; }
