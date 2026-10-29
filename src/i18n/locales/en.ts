@@ -15,7 +15,7 @@ export const en = {
 	'settings.sizeUniform': 'Uniform',
 	'settings.sizeOutgoing': 'By outgoing connections',
 	'settings.sizeIncoming': 'By incoming connections',
-	'settings.nodeSizeDescription': 'Size uses the number of unique connections in the visible graph. Larger counts produce larger circles, up to a fixed limit.',
+	'settings.nodeSizeDescription': 'Size uses the number of unique connections in the visible graph. The smallest and largest counts set the size range; larger counts produce larger circles.',
 	'graph.metadataFilter': 'Filter by {property}',
 	'graph.allValues': 'All values',
 	'graph.valueUnavailable': '{value} (not in index)',

@@ -23,6 +23,23 @@ void test('default node sizes are uniform and unknown modes fall back to uniform
 	assert.ok(projectGraph(graph, DEFAULT_GRAPH_OPTIONS).nodes.every((node) => node.nodeSize === 22));
 });
 
+void test('relative sizing makes a narrow range visible and keeps large hubs distinct above the old cap', () => {
+	const targets = Array.from({ length: 100 }, (_, index) => `${index}.md`);
+	const source = buildGraph([note('small.md', targets.slice(0, 80)), note('medium.md', targets.slice(0, 90)),
+		note('large.md', targets), ...targets.map((path) => note(path))]);
+	const sizes = projectGraph(source, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'outgoing' });
+	const size = (path: string) => sizes.nodes.find((node) => node.path === path)!.nodeSize;
+	assert.equal(size('large.md'), 88);
+	assert.ok(size('large.md') - size('medium.md') > 6);
+	assert.ok(size('medium.md') - size('small.md') > 6);
+	const narrowGraph = buildGraph(Array.from({ length: 14 }, (_, index) => note(`${index}.md`,
+		Array.from({ length: index === 0 ? 12 : index === 1 ? 11 : 10 }, (_, offset) => `${(index + offset + 1) % 14}.md`))));
+	const narrow = projectGraph(narrowGraph, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'outgoing' });
+	assert.equal(narrow.nodes.find((node) => node.path === '0.md')!.nodeSize, 88);
+	assert.equal(narrow.nodes.find((node) => node.path === '1.md')!.nodeSize, 55);
+	assert.equal(narrow.nodes.find((node) => node.path === '2.md')!.nodeSize, 22);
+});
+
 void test('node sizes follow directed incoming or outgoing counts without duplicate Markdown links', () => {
 	const outgoing = projectGraph(graph, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'outgoing' });
 	const incoming = projectGraph(graph, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'incoming' });
@@ -49,17 +66,17 @@ void test('large hubs are bounded while rendering and collision footprints use a
 	const star = buildGraph([note('hub.md', targets), ...targets.map((path) => note(path, ['sink.md'])), note('sink.md')]);
 	const outgoing = projectGraph(star, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'outgoing' });
 	const incoming = projectGraph(star, { ...DEFAULT_GRAPH_OPTIONS, nodeSizeMode: 'incoming' });
-	assert.equal(outgoing.nodes.find((node) => node.path === 'hub.md')!.nodeSize, 64);
-	assert.equal(incoming.nodes.find((node) => node.path === 'sink.md')!.nodeSize, 64);
+	assert.equal(outgoing.nodes.find((node) => node.path === 'hub.md')!.nodeSize, 88);
+	assert.equal(incoming.nodes.find((node) => node.path === 'sink.md')!.nodeSize, 88);
 	const container = { ownerDocument: { defaultView: { getComputedStyle: () => ({ getPropertyValue: () => '' }) } } } as unknown as HTMLElement;
 	const cy = cytoscape({ headless: true, styleEnabled: true, layout: { name: 'preset' }, style: graphStyle(container, DEFAULT_GRAPH_OPTIONS) });
 	try {
 		syncGraph(cy, outgoing);
 		const hub = cy.getElementById(outgoing.nodes.find((node) => node.path === 'hub.md')!.id);
-		assert.equal(parseFloat(hub.style('width') as string), 64);
-		assert.equal(parseFloat(hub.style('height') as string), 64);
+		assert.equal(parseFloat(hub.style('width') as string), 88);
+		assert.equal(parseFloat(hub.style('height') as string), 88);
 		const footprint = createLayoutRequest(cy, 110, false).nodes.find((node) => node.id === hub.id())!;
-		assert.ok(footprint.width! >= 64 && footprint.height! >= 64);
+		assert.ok(footprint.width! >= 88 && footprint.height! >= 88);
 	} finally { cy.destroy(); }
 });
 

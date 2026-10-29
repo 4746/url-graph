@@ -17,7 +17,7 @@ export const uk = {
 	'settings.sizeUniform': 'Однаковий',
 	'settings.sizeOutgoing': 'За кількістю вихідних зв’язків',
 	'settings.sizeIncoming': 'За кількістю вхідних зв’язків',
-	'settings.nodeSizeDescription': 'Розмір залежить від кількості унікальних зв’язків у видимому графі. Більше зв’язків — більший кружок, до встановленої межі.',
+	'settings.nodeSizeDescription': 'Розмір залежить від кількості унікальних зв’язків у видимому графі. Найменше й найбільше значення задають шкалу: більше зв’язків — більший вузол.',
 	'graph.metadataFilter': 'Фільтр за властивістю {property}',
 	'graph.allValues': 'Усі значення',
 	'graph.valueUnavailable': '{value} (немає в індексі)',
